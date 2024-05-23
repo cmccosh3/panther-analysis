@@ -1,0 +1,48 @@
+AnalysisType: rule
+Filename: login_from_different_ip.py
+RuleID: "LogFamily.LogType.LoginFromDifferentIP"
+DisplayName: "identity Login from Different IP Address"
+Enabled: true
+LogTypes:
+  - AdminDashLogs # Adjust this to your specific log type
+Tags:
+  - Security
+Reports:
+  MITRE ATT&CK:
+    - "TA0006:T1078" # Valid Accounts
+  PCI:
+    - "8.1.6" # Log and alert on suspicious login activity
+Severity: Medium
+Description: >
+  Detects login events from the same identity but from a different IP address. This can help identify potential account compromise or unusual login activity.
+Runbook: >
+  Verify the legitimacy of the login attempt by the identity from the new IP address. Check for any signs of account compromise or unauthorized access.
+Reference: https://docs.yourcompany.com/security/events#login-from-different-ip
+DedupPeriodMinutes: 15
+Threshold: 1
+SummaryAttributes:
+  - remote_ip
+  - identity
+InlineFilters:
+  - KeyPath: environment
+    Condition: StartsWith
+    Value: "Production"
+Tests:
+  - Name: Login from different IP address
+    ExpectedResult: true
+    Log:
+      remote_ip: "216.239.47.100"
+      service: "admin-dash"
+      log_level: "INFO"
+      timestamp: "2022-08-01T16:34:07.092Z"
+      identity: "alice@example"
+      message: "Login attempt succeeded"
+  - Name: Login from same IP address
+    ExpectedResult: false
+    Log:
+      remote_ip: "216.239.47.100"
+      service: "admin-dash"
+      log_level: "INFO"
+      timestamp: "2022-08-01T16:35:07.092Z"
+      identity: "alice@example"
+      message: "Login attempt succeeded"
