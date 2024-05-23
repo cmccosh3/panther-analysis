@@ -1,0 +1,48 @@
+AnalysisType: rule
+Filename: after_hours_accesspy
+RuleID: "LogFamily.LogType.FailedLoginOutsideHours"
+DisplayName: "Failed Login Attempt Outside Permitted Hours"
+Enabled: true
+LogTypes:
+  - Custom.AdminDashAccess.V1 # Adjust this to your specific log type
+Tags:
+  - Security
+Reports:
+  MITRE ATT&CK:
+    - "TA0006:T1078" # Valid Accounts
+  PCI:
+    - "8.1.6" # Log and alert on failed login attempts
+Severity: Medium
+Description: >
+  Detects failed login attempts outside the permitted hours of 7am to 8pm EST. This can help identify suspicious login activities potentially indicating malicious attempts.
+Runbook: >
+  Investigate the source IP and the account attempting to log in. Verify if the login attempt was legitimate or a potential threat. Take appropriate actions such as alerting the user or blocking the IP.
+Reference: https://docs.yourcompany.com/security/events#failed-login
+DedupPeriodMinutes: 15
+Threshold: 1
+SummaryAttributes:
+  - remote_ip
+  - identity
+InlineFilters:
+  - KeyPath: environment
+    Condition: StartsWith
+    Value: "Production"
+Tests:
+  - Name: Failed login attempt outside permitted hours
+    ExpectedResult: true
+    Log:
+      remote_ip: "216.239.47.100"
+      service: "admin-dash"
+      loglevel: "INFO"
+      timestamp: "2022-08-01T23:33:12.421Z"
+      identity: "alice@example"
+      message: "Login failed. Attempt: 1"
+  - Name: Successful login attempt within permitted hours
+    ExpectedResult: false
+    Log:
+      remote_ip: "216.239.47.100"
+      service: "admin-dash"
+      log_evel: "INFO"
+      timestamp: "2022-08-01T16:34:07.092Z"
+      identity: "alice@example"
+      message: "Login attempt succeeded"
