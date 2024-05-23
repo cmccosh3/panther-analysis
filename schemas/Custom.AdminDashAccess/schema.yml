@@ -1,0 +1,27 @@
+schema: Custom.AdminDashAccess.V1
+parser:
+  fastmatch:
+    # Define an array of patterns to match against.
+    # In this example we only use one pattern because the log format is the same for all lines.
+    # If we wanted to include the Apache Extended Log format, we could provide an additional pattern.
+    match:
+      - '%{remote_ip} %{service} [%{loglevel}] [%{timestamp}] "%{identity} %{message}'
+    emptyValues: [ '-' ] # specify that `-` string values are considered null
+fields:
+  - name: remote_ip
+    type: string
+    indicators:
+      - ip
+  - name: service
+    type: string
+  - name: loglevel
+    type: string    
+  - name: timestamp
+    type: timestamp
+    isEventTime: true
+    timeFormats:
+     - '%d/%b/%Y:%H:%M:%S %z'
+  - name: identity
+    type: string
+  - name: message
+    type: string
